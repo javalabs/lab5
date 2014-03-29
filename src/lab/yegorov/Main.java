@@ -1,12 +1,13 @@
 package lab.yegorov;
 
-
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.Vector;
 
 /**
  * Created by AdminPC on 14.02.14.
  */
+
 /*
 Задание на лабораторную работу:
 1.	Разработать в программе следующие классы:
@@ -22,14 +23,14 @@ Variant 3.	Задана строка a. Преобразовать каждое 
 чтобы все предыдущие  вхождения его последней буквы были заменены на заданный символ b.
 Пример
 a=”минимум”,b=”.” => rez = “.ини.ум”.
-
-
  */
+
 public class Main {
     public static void main(String args[]) {
-        ReplaceChar t = new ReplaceChar("минимум -   привев 1111 minimum Hello,,--\\  world tvtvvvht", '.');//Hello,,--\  world tvtvvvht
-        System.out.println("минимум -   привев 1111 minimum Hello,,--\\  world tvtvvvht");
-        System.out.println(t.toConvert());
+        ReplaceCharTest t = new ReplaceCharTest();
+        t.Test();
+        t.writeInputStringAndReplaceChar();
+        t.Test();
     }
 }
 
@@ -45,7 +46,7 @@ class ReplaceChar {
     public String toConvert() {
 
         Vector<String> word = new Vector<String>();
-        word.addAll(Arrays.asList(inputString.split("[ ,.?!:;\\\\\\-0-9]")));
+        word.addAll(Arrays.asList(inputString.split("[ ,.?!:;—<>()\\\\\\-0-9]")));
         word.removeAll(Arrays.asList("")); //удаляем пустые строки
         word.trimToSize();
 
@@ -57,7 +58,7 @@ class ReplaceChar {
         char endChar;
         int endNum;
         StringBuilder strBuild;
-        String rezult = new String("");
+        String rezult = "";
 
         for(int it = 0; it < word.size(); ++it) {
             endNum  = (word.elementAt(it)).length() - 1;
@@ -72,20 +73,72 @@ class ReplaceChar {
             word.add(it,strBuild.toString());
         }
 
-        for(int i = 0, j = 0; i < word.size(); ++i) {
-            if(j<punct.size())
-                rezult += word.elementAt(i) + punct.elementAt(j++);
-            else
-                rezult += word.elementAt(i);
+        boolean t = isfirstPunct();
+
+        for(int i = 0, j = 0; i+j < word.size() + punct.size();) {
+            if(t) {
+                if(j < punct.size())
+                    rezult += punct.elementAt(j++);
+                if(i < word.size())
+                    rezult += word.elementAt(i++);
+            }
+            else {
+                if(i < word.size())
+                    rezult += word.elementAt(i++);
+                if(j < punct.size())
+                    rezult += punct.elementAt(j++);
+            }
         }
 
         return rezult;
+    }
+    private boolean isfirstPunct() {
+        char[] m = " ,.?!:;—()<>0123456789".toCharArray();
+        for(int i=0; i<m.length; ++i) {
+            if(m[i]==inputString.charAt(0))
+                return true;
+        }
+        return false;
+    }
+    public String getInputString() {
+        return inputString;
+    }
+    public void setInputString(String inputString) {
+        this.inputString = inputString;
+    }
+
+    public char getReplaceChar() {
+        return b;
+    }
+    public void setReplaceChar(char b) {
+        this.b = b;
     }
 }
 
 class ReplaceCharTest extends ReplaceChar {
     public ReplaceCharTest() {
-        super("sometext",'a');
+        super("Java — объектно-ориентированный язык программирования, разработанный компанией Sun Microsystems " +
+              "(в последующем приобретённой компанией Oracle)",'.');
     }
-    //TODO testing
+    public void writeInputStringAndReplaceChar() {
+        Scanner cin = new Scanner(System.in);
+        try {
+            System.out.print("Введите строку для тестирования:\n>>> ");
+            setInputString(cin.nextLine());
+
+            System.out.print("\nВведите символ для замены: (при вводе строки будет использован первый символ)\n>>> ");
+            setReplaceChar(cin.nextLine().charAt(0));
+
+        }catch (Exception e) {
+            //
+            System.out.println("exception...");
+            //
+            Runtime.getRuntime().halt(0);
+            System.exit(0);
+        }
+    }
+    public void Test() {
+        System.out.println("Input string (replace symbol: "+getReplaceChar()+"): \n"+getInputString());
+        System.out.println("Output string: \n"+toConvert());
+    }
 }
